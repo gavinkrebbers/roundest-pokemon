@@ -16,7 +16,7 @@ function Home({ pokemonList }) {
                 Which Pokémon is Rounder?
             </h1>
 
-            <div className="flex flex-row flex-col items-center justify-center w-full max-w-4xl gap-8">
+            <div className="flex flex-row items-center justify-center w-full max-w-4xl gap-8">
                 {pokemon.slice(0, 2).map((curPokemon, index) => (
                     <div
                         key={index}
