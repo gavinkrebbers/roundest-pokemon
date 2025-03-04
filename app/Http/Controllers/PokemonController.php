@@ -30,9 +30,9 @@ class PokemonController extends Controller
             $winnerEloFinal = $winnerEloPrev + $kFactor * (1 - $winnerExpectedScore);
             $loserEloFinal = $losingEloPrev + $kFactor * (-$loserExpectedScore);
 
-            $winningPokemon->elo = $winnerEloFinal;
+            $winningPokemon->elo = (int) $winnerEloFinal;
             $winningPokemon->save();
-            $losingPokemon->elo = $loserEloFinal;
+            $losingPokemon->elo = (int) $loserEloFinal;
             $losingPokemon->save();
         }
 
