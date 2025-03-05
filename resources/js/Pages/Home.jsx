@@ -1,5 +1,6 @@
 import Navbar from "@/Layouts/Navbar";
 import { router } from "@inertiajs/react";
+
 function Home({ pokemonList }) {
     const pokemon = pokemonList;
 
@@ -32,7 +33,8 @@ function Home({ pokemonList }) {
                                 onClick={() => handleClick(index)}
                                 className="w-full px-4 py-3 text-lg font-medium text-white transition-colors duration-300 ease-in-out bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                             >
-                                {curPokemon.name}
+                                {curPokemon.name.charAt(0).toUpperCase() +
+                                    curPokemon.name.slice(1)}
                             </button>
                         </div>
                     </div>
