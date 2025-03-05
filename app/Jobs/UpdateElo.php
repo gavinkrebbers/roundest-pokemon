@@ -26,7 +26,6 @@ class UpdateElo implements ShouldQueue
     {
         $winningPokemon = Pokemon::findOrFail($this->winnerId);
         $losingPokemon = Pokemon::findOrFail($this->loserId);
-        Log::info($winningPokemon);
         $winnerEloPrev = $winningPokemon->elo;
         $losingEloPrev = $losingPokemon->elo;
 
