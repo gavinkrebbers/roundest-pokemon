@@ -36,10 +36,12 @@ function Home({ groupedList }) {
         setIndex((prev) => prev + 1);
         setCurrentPair((pair) => groupedList[index]);
 
-        router.post(route("updateElo"), {
-            winner: currentPair[cardIndex],
-            loser: currentPair[+!cardIndex],
-        });
+        setTimeout(() => {
+            router.post(route("updateElo"), {
+                winner: currentPair[cardIndex],
+                loser: currentPair[+!cardIndex],
+            });
+        }, 0);
     };
 
     return (
