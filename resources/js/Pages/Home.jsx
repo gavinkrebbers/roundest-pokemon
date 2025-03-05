@@ -33,8 +33,9 @@ function Home({ groupedList }) {
             router.get(route("home"));
             return;
         }
-        setCurrentPair(groupedList[index + 1]);
-        setIndex(index + 1);
+        setIndex((prev) => prev + 1);
+        setCurrentPair((pair) => groupedList[index]);
+
         router.post(route("updateElo"), {
             winner: currentPair[cardIndex],
             loser: currentPair[+!cardIndex],
