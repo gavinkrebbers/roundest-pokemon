@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\UpdateElo;
 use App\Models\Pokemon;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class PokemonController extends Controller
 {
@@ -40,6 +42,32 @@ class PokemonController extends Controller
         return inertia('Home', ['pokemonList' => $pokemonList]);
     }
 
+    public function updateElo(Request $request)
+    {
+
+        $winnerId = $request->input("winner")["id"];
+        $loserId = $request->input("loser")["id"];
+        // UpdateElo::dispatch($winnerId, $loserId);
+        UpdateElo::dispatch($winnerId, $loserId);
+
+        // dd($winnerId, $loserId);
+    }
+
+
+    public function generateSets()
+    {
+        $pokemonList = Pokemon::inRandomOrder()->limit(100)->get();
+        $length = count($pokemonList);
+        $groupedList = [];
+        for ($i = 0; $i < $length; $i += 2) {
+            $group = [
+                $pokemonList[$i],
+                $pokemonList[$i + 1]
+            ];
+            $groupedList[] = $group;
+        }
+        return Inertia::render('Home', ["groupedList" => $groupedList]);
+    }
 
     public function index()
     {
