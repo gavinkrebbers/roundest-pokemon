@@ -30,21 +30,17 @@ function Home({ groupedList }) {
 
     const handleClick = (cardIndex) => {
         if (index + 1 >= groupedList.length) {
-            router.get(route("Home"));
+            console.log("this should get new guys ");
+
+            router.get(route("home"));
             return;
         }
         setCurrentPair(groupedList[index + 1]);
         setIndex(index + 1);
-        Inertia.progress.off();
-
-        router
-            .post(route("updateElo"), {
-                winner: currentPair[cardIndex],
-                loser: currentPair[+!cardIndex],
-            })
-            .then(() => {
-                Inertia.progress.on();
-            });
+        router.post(route("updateElo"), {
+            winner: currentPair[cardIndex],
+            loser: currentPair[+!cardIndex],
+        });
     };
 
     return (
