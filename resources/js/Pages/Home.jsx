@@ -30,8 +30,6 @@ function Home({ groupedList }) {
 
     const handleClick = (cardIndex) => {
         if (index + 1 >= groupedList.length) {
-            console.log("this should get new guys ");
-
             router.get(route("home"));
             return;
         }
