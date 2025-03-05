@@ -71,7 +71,8 @@ class PokemonController extends Controller
 
     public function index()
     {
-        $pokemonData = Pokemon::orderBy('elo', 'desc')->paginate(50);
-        return inertia('Index', ['pokemonData' => $pokemonData]);
+        $paginatedData = Pokemon::orderBy('elo', 'desc')->paginate(200);
+        $allPokemon = Pokemon::all();
+        return inertia('Index', ['paginatedData' => $paginatedData, 'allPokemon' => $allPokemon]);
     }
 }
