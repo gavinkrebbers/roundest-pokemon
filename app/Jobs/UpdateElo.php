@@ -32,7 +32,7 @@ class UpdateElo implements ShouldQueue
         $winnerExpectedScore = $this->expectedScore($winnerEloPrev, $losingEloPrev);
         $loserExpectedScore = $this->expectedScore($losingEloPrev, $winnerEloPrev);
 
-        $kFactor = 32;
+        $kFactor = 96;
 
         $winnerEloFinal = $winnerEloPrev + $kFactor * (1 - $winnerExpectedScore);
         $loserEloFinal = $losingEloPrev + $kFactor * (0 - $loserExpectedScore);
