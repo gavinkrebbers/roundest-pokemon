@@ -1,3 +1,5 @@
+"use client";
+
 import Navbar from "@/Layouts/Navbar";
 import { router, usePage } from "@inertiajs/react";
 import { useState, useEffect } from "react";
@@ -64,9 +66,7 @@ function Home({ groupedList }) {
         <div
             className="flex flex-col items-center justify-center min-h-screen px-4 py-12 text-white bg-gray-900 sm:px-6 lg:px-8"
             style={{
-                backgroundImage: showBg
-                    ? `url(/placeholder.svg?height=1080&width=1920)`
-                    : "none",
+                backgroundImage: showBg ? `url(${bgImage})` : "none",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
@@ -110,7 +110,8 @@ function Home({ groupedList }) {
                             <img
                                 src={
                                     curPokemon.image_url ||
-                                    "/placeholder.svg?height=256&width=256"
+                                    "/placeholder.svg?height=256&width=256" ||
+                                    "/placeholder.svg"
                                 }
                                 alt={curPokemon.name}
                                 className={`object-contain w-full h-64 p-4 bg-gray-700 ${
