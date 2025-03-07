@@ -1,9 +1,16 @@
 import Navbar from "@/Layouts/Navbar";
 import { Link } from "@inertiajs/react";
+import { all } from "axios";
 import { Search } from "lucide-react";
 import { useState } from "react";
 
 function Index({ paginatedData, allPokemon }) {
+    let sum = 0;
+    for (let i = 0; i < allPokemon.length; i++) {
+        sum += allPokemon[i].elo;
+    }
+    console.log(sum / allPokemon.length);
+
     const [searchTerm, setSearchTerm] = useState("");
 
     const filteredPokemon = searchTerm

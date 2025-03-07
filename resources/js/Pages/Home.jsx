@@ -3,7 +3,7 @@
 import Navbar from "@/Layouts/Navbar";
 import { router, usePage } from "@inertiajs/react";
 import { useState, useEffect } from "react";
-import bgImage from "/public/pile_of_pokemon_by_happycrumble_d37wz2i-fullview.jpg";
+import bgImage from "/public/pile_of_pokemon_by_happycrumble_d37wz2i-fullviewupscale.jpg";
 import { Sun } from "lucide-react";
 
 function Home({ groupedList }) {
