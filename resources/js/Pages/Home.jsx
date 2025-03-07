@@ -105,7 +105,7 @@ function Home({ groupedList }) {
                     {currentPair.slice(0, 2).map((curPokemon, i) => (
                         <div
                             key={i}
-                            className="w-full max-w-xs overflow-hidden transition-transform duration-300 ease-in-out transform bg-gray-800 rounded-lg md:hover:scale-105 sm:w-1/2"
+                            className="w-full max-w-xs overflow-hidden transition-transform duration-300 ease-in-out transform bg-gray-800 rounded-lg sm:w-1/2"
                         >
                             <img
                                 src={
