@@ -15,32 +15,7 @@ class PokemonController extends Controller
     }
 
 
-    public function compare($winner = null, $loser = null)
-    {
-        if ($winner && $loser) {
-            $winningPokemon = Pokemon::findOrFail($winner);
-            $losingPokemon = Pokemon::findOrFail($loser);
 
-            $winnerEloPrev = $winningPokemon->elo;
-            $losingEloPrev = $losingPokemon->elo;
-
-            $winnerExpectedScore = $this->expectedScore($winnerEloPrev, $losingEloPrev);
-            $loserExpectedScore = $this->expectedScore($losingEloPrev, $winnerEloPrev);
-
-            $kFactor = 32;
-
-            $winnerEloFinal = $winnerEloPrev + $kFactor * (1 - $winnerExpectedScore);
-            $loserEloFinal = $losingEloPrev + $kFactor * (0 - $loserExpectedScore);
-
-            $winningPokemon->elo = (int) $winnerEloFinal;
-            $winningPokemon->save();
-            $losingPokemon->elo = (int) $loserEloFinal;
-            $losingPokemon->save();
-        }
-
-        $pokemonList = Pokemon::inRandomOrder()->limit(2)->get();
-        return inertia('Home', ['pokemonList' => $pokemonList]);
-    }
 
     public function updateElo(Request $request)
     {
@@ -52,7 +27,40 @@ class PokemonController extends Controller
 
         // dd($winnerId, $loserId);
     }
+    public function skillBasedPairs()
+    {
 
+        $allPokemon = Pokemon::all()->toArray();
+        $size = sizeof($allPokemon);
+
+        usort($allPokemon, function ($a, $b) {
+            return $a['elo'] <=> $b['elo'];
+        });
+        $groupedList = [];
+        for ($i = 0; $i < 100; $i++) {
+            $startingIndex = rand(0, $size - 1);
+
+            $competitorIndex = $this->generateIndexes($startingIndex, $size);
+            $curPair = [];
+            $curPair[] = $allPokemon[$startingIndex];
+            $curPair[] = $allPokemon[$competitorIndex];
+            $groupedList[] = $curPair;
+        }
+        return Inertia::render('Home', ["groupedList" => $groupedList]);
+    }
+
+    private function generateIndexes(int $startingIndex, int $size)
+    {
+        $offest = 0;
+        while ($offest == 0) {
+            $offest = rand(-20, 20);
+        }
+        $competitorIndex = $startingIndex + $offest;
+        if ($competitorIndex >= $size || $competitorIndex <= 0) {
+            $competitorIndex = $startingIndex - $offest;
+        }
+        return $competitorIndex;
+    }
 
     public function generateSets()
     {

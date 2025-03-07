@@ -11,7 +11,9 @@ use Inertia\Inertia;
 Route::resource('pokemon', PokemonController::class);
 
 Route::get('/pokemon', [PokemonController::class, 'index'])->name('index');
-Route::get('/', [PokemonController::class, 'generateSets'])->name('home');
+Route::get('/', [PokemonController::class, 'skillBasedPairs'])->name('home');
 Route::post('/updateElo', [PokemonController::class, 'updateElo'])->name('updateElo');
+
+// Route::get('/skillbased', [PokemonController::class, 'skillBasedPairs'])->name('skillBased');
 
 Route::get('/{winner?}/{loser?}', [PokemonController::class, 'compare'])->name('home');
