@@ -10,16 +10,7 @@ function Home({ groupedList }) {
     const [currentPair, setCurrentPair] = useState(groupedList[0]);
     const [index, setIndex] = useState(0);
     const [loadedImages, setLoadedImages] = useState([false, false]);
-    const { url } = usePage();
     const [showBg, setShowBg] = useState(false);
-
-    const route = (routeName, params = {}) => {
-        const currentUrl = new URL(url, window.location.origin);
-        const baseUrl = currentUrl.origin;
-
-        const routeUrl = baseUrl + window.route(routeName, params);
-        return routeUrl;
-    };
 
     const handleImageLoad = (imgIndex) => {
         setLoadedImages((prev) => {
@@ -47,8 +38,9 @@ function Home({ groupedList }) {
             router.get(window.route("home"));
             return;
         }
-        setIndex((prev) => prev + 1);
-        setCurrentPair((pair) => groupedList[index]);
+
+        setIndex(index + 1);
+        setCurrentPair(groupedList[index + 1]);
 
         setTimeout(() => {
             router.post(window.route("updateElo"), {
@@ -56,10 +48,6 @@ function Home({ groupedList }) {
                 loser: currentPair[+!cardIndex],
             });
         }, 0);
-    };
-
-    const changeBg = () => {
-        setShowBg(!showBg);
     };
 
     return (
@@ -87,7 +75,9 @@ function Home({ groupedList }) {
                         : "bg-gray-700 hover:bg-gray-800"
                 }`}
                 aria-label="Toggle background"
-                onClick={changeBg}
+                onClick={() => {
+                    setShowBg(!showBg);
+                }}
             >
                 <Sun className="w-6 h-6" />
             </button>
