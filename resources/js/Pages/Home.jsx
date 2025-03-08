@@ -1,6 +1,8 @@
+"use client";
+
 import Navbar from "@/Layouts/Navbar";
-import { router } from "@inertiajs/react";
-import { useState, useEffect } from "react";
+import { router, usePage } from "@inertiajs/react";
+import { useState, useEffect, useCallback } from "react";
 import bgImage from "/public/pile_of_pokemon_by_happycrumble_d37wz2i-fullviewupscale.jpg";
 import { Sun } from "lucide-react";
 import Cookies from "js-cookie";
@@ -11,6 +13,7 @@ export default function Home({ groupedList }) {
     const [loadedImages, setLoadedImages] = useState([false, false]);
     const [showBg, setShowBg] = useState(false);
     const [totalClicks, setTotalClicks] = useState(0);
+    const [eloUpdateQueue, setEloUpdateQueue] = useState([]);
 
     const handleImageLoad = (imgIndex) => {
         setLoadedImages((prev) => {
@@ -20,58 +23,86 @@ export default function Home({ groupedList }) {
         });
     };
 
-    const preloadImages = (nextIndex) => {
-        if (nextIndex < groupedList.length) {
-            groupedList[nextIndex].forEach((pokemon) => {
-                const img = new Image();
-                img.src = pokemon.image_url;
-            });
+    const preloadImages = useCallback(
+        (nextIndex) => {
+            if (nextIndex < groupedList.length) {
+                groupedList[nextIndex].forEach((pokemon) => {
+                    const img = new Image();
+                    img.src = pokemon.image_url;
+                });
+            }
+        },
+        [groupedList]
+    );
+
+    useEffect(() => {
+        if (eloUpdateQueue.length > 0) {
+            const timer = setTimeout(() => {
+                const update = eloUpdateQueue[0];
+                router.post(route("updateElo"), update);
+                setEloUpdateQueue((prev) => prev.slice(1));
+            }, 0);
+
+            return () => clearTimeout(timer);
         }
-    };
+    }, [eloUpdateQueue]);
 
     useEffect(() => {
         preloadImages(index + 1);
-    }, [index]);
-
-    const handleClick = (cardIndex) => {
-        setTotalClicks((prevCount) => {
-            const nextCount = +prevCount + 1;
-            Cookies.set("totalClicks", Number(nextCount));
-            return nextCount;
-        });
-
-        setIndex((prevIndex) => {
-            const nextIndex = prevIndex + 1;
-            if (nextIndex >= groupedList.length) {
-                router.get(route("home"));
-            } else {
-                setCurrentPair(groupedList[nextIndex]);
-            }
-            return nextIndex;
-        });
-        router.post(route("updateElo"), {
-            winner: currentPair[cardIndex],
-            loser: currentPair[+!cardIndex],
-        });
-    };
+    }, [index, preloadImages]);
 
     useEffect(() => {
         let bgCookie = Cookies.get("showBG");
-        let counterCookie = Cookies.get("totalClicks");
+        const counterCookie = Cookies.get("totalClicks");
 
         if (counterCookie == undefined) {
-            Cookies.set("totalClicks", 0);
+            Cookies.set("totalClicks", "0");
             setTotalClicks(0);
         } else {
-            setTotalClicks(counterCookie);
+            setTotalClicks(Number(counterCookie));
         }
+
         if (bgCookie === undefined) {
             Cookies.set("showBG", "false");
             bgCookie = "false";
         }
 
         setShowBg(bgCookie === "true");
-    }, []);
+
+        preloadImages(0);
+    }, [preloadImages]);
+
+    const handleClick = (cardIndex) => {
+        // Update total clicks
+        setTotalClicks((prevCount) => {
+            const nextCount = Number(prevCount) + 1;
+            Cookies.set("totalClicks", String(nextCount));
+            return nextCount;
+        });
+
+        const winner = currentPair[cardIndex];
+        const loser = currentPair[+!cardIndex];
+        setEloUpdateQueue((prev) => [...prev, { winner, loser }]);
+
+        setIndex((prevIndex) => {
+            const nextIndex = prevIndex + 1;
+
+            setLoadedImages([false, false]);
+
+            if (nextIndex >= groupedList.length) {
+                router.get(route("home"));
+                return prevIndex;
+            } else {
+                setCurrentPair(groupedList[nextIndex]);
+
+                setTimeout(() => {
+                    preloadImages(nextIndex + 1);
+                }, 100);
+
+                return nextIndex;
+            }
+        });
+    };
 
     const toggleBg = () => {
         setShowBg((prev) => {
@@ -124,22 +155,23 @@ export default function Home({ groupedList }) {
                     <div className="flex flex-row items-center justify-center w-full max-w-4xl gap-8">
                         {currentPair.slice(0, 2).map((curPokemon, i) => (
                             <div
-                                key={i}
+                                key={`${curPokemon.name}-${index}-${i}`}
                                 className="w-full max-w-xs overflow-hidden transition-transform duration-300 ease-in-out transform bg-gray-800 rounded-lg sm:w-1/2"
                             >
-                                <img
-                                    src={
-                                        curPokemon.image_url ||
-                                        "/placeholder.svg?height=256&width=256" ||
-                                        "/placeholder.svg"
-                                    }
-                                    alt={curPokemon.name}
-                                    className={`object-contain w-full h-64 p-4 bg-gray-700 ${
-                                        loadedImages[i] ? "" : "bg-gray-600"
-                                    }`}
-                                    onLoad={() => handleImageLoad(i)}
-                                    loading="lazy"
-                                />
+                                <div className="relative h-64 bg-gray-700">
+                                    <img
+                                        src={curPokemon.image_url}
+                                        alt={curPokemon.name}
+                                        className={`object-contain w-full h-64 p-4 transition-opacity duration-300`}
+                                        onLoad={() => handleImageLoad(i)}
+                                        loading="eager"
+                                    />
+                                    {!loadedImages[i] && (
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="w-12 h-12 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+                                        </div>
+                                    )}
+                                </div>
                                 <div className="p-4">
                                     <div className="flex items-center justify-between mb-3">
                                         <h3 className="text-lg font-medium text-white">
