@@ -40,12 +40,15 @@ export default function Home({ groupedList }) {
             return nextCount;
         });
 
-        if (index + 1 >= groupedList.length) {
-            router.get(window.route("home"));
-            return;
-        }
-        setIndex(index + 1);
-        setCurrentPair(groupedList[index]);
+        setIndex((prevIndex) => {
+            const nextIndex = prevIndex + 1;
+            if (nextIndex >= groupedList.length) {
+                router.get(window.route("home"));
+            } else {
+                setCurrentPair(groupedList[nextIndex]);
+            }
+            return nextIndex;
+        });
 
         setTimeout(() => {
             router.post(window.route("updateElo"), {
@@ -172,7 +175,3 @@ export default function Home({ groupedList }) {
         </Navbar>
     );
 }
-
-// Home.layout = (page) => <Navbar children={page} />;
-
-// export default Home;
