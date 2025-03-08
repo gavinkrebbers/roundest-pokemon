@@ -1,16 +1,16 @@
-"use client";
-
 import Navbar from "@/Layouts/Navbar";
-import { router, usePage } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
 import { useState, useEffect } from "react";
 import bgImage from "/public/pile_of_pokemon_by_happycrumble_d37wz2i-fullviewupscale.jpg";
 import { Sun } from "lucide-react";
+import Cookies from "js-cookie";
 
 function Home({ groupedList }) {
     const [currentPair, setCurrentPair] = useState(groupedList[0]);
     const [index, setIndex] = useState(0);
     const [loadedImages, setLoadedImages] = useState([false, false]);
     const [showBg, setShowBg] = useState(false);
+    const [totalClicks, setTotalClicks] = useState(0);
 
     const handleImageLoad = (imgIndex) => {
         setLoadedImages((prev) => {
@@ -34,13 +34,18 @@ function Home({ groupedList }) {
     }, [index]);
 
     const handleClick = (cardIndex) => {
+        setTotalClicks((prevCount) => {
+            const nextCount = +prevCount + 1;
+            Cookies.set("totalClicks", Number(nextCount));
+            return nextCount;
+        });
+
         if (index + 1 >= groupedList.length) {
             router.get(window.route("home"));
             return;
         }
-
         setIndex(index + 1);
-        setCurrentPair(groupedList[index + 1]);
+        setCurrentPair(groupedList[index]);
 
         setTimeout(() => {
             router.post(window.route("updateElo"), {
@@ -48,6 +53,32 @@ function Home({ groupedList }) {
                 loser: currentPair[+!cardIndex],
             });
         }, 0);
+    };
+
+    useEffect(() => {
+        let bgCookie = Cookies.get("showBG");
+        let counterCookie = Cookies.get("totalClicks");
+
+        if (counterCookie == undefined) {
+            Cookies.set("totalClicks", 0);
+            setTotalClicks(0);
+        } else {
+            setTotalClicks(counterCookie);
+        }
+        if (bgCookie === undefined) {
+            Cookies.set("showBG", "false");
+            bgCookie = "false";
+        }
+
+        setShowBg(bgCookie === "true");
+    }, []);
+
+    const toggleBg = () => {
+        setShowBg((prev) => {
+            const newValue = !prev;
+            Cookies.set("showBG", newValue ? "true" : "false");
+            return newValue;
+        });
     };
 
     return (
@@ -75,9 +106,7 @@ function Home({ groupedList }) {
                         : "bg-gray-700 hover:bg-gray-800"
                 }`}
                 aria-label="Toggle background"
-                onClick={() => {
-                    setShowBg(!showBg);
-                }}
+                onClick={toggleBg}
             >
                 <Sun className="w-6 h-6" />
             </button>
@@ -133,8 +162,9 @@ function Home({ groupedList }) {
                     ))}
                 </div>
 
-                <p className="mt-8 text-center text-gray-400">
-                    Click on the Pokémon you think is rounder!
+                <p className="mt-8 text-center text-gray-100">
+                    You have only voted {totalClicks} times. Get those numbers
+                    up.
                 </p>
             </div>
         </div>
