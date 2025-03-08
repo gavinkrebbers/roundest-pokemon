@@ -43,19 +43,16 @@ export default function Home({ groupedList }) {
         setIndex((prevIndex) => {
             const nextIndex = prevIndex + 1;
             if (nextIndex >= groupedList.length) {
-                router.get(window.route("home"));
+                router.get(route("home"));
             } else {
                 setCurrentPair(groupedList[nextIndex]);
             }
             return nextIndex;
         });
-
-        setTimeout(() => {
-            router.post(window.route("updateElo"), {
-                winner: currentPair[cardIndex],
-                loser: currentPair[+!cardIndex],
-            });
-        }, 0);
+        router.post(route("updateElo"), {
+            winner: currentPair[cardIndex],
+            loser: currentPair[+!cardIndex],
+        });
     };
 
     useEffect(() => {
