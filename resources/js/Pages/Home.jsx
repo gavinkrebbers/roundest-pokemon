@@ -73,7 +73,6 @@ export default function Home({ groupedList }) {
     }, [preloadImages]);
 
     const handleClick = (cardIndex) => {
-        // Update total clicks
         setTotalClicks((prevCount) => {
             const nextCount = Number(prevCount) + 1;
             Cookies.set("totalClicks", String(nextCount));
@@ -89,7 +88,7 @@ export default function Home({ groupedList }) {
 
             setLoadedImages([false, false]);
 
-            if (nextIndex >= groupedList.length) {
+            if (nextIndex >= groupedList.length - 1) {
                 router.get(route("home"));
                 return prevIndex;
             } else {
