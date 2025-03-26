@@ -9,24 +9,38 @@ use Inertia\Inertia;
 
 class PokemonController extends Controller
 {
-    public function expectedScore($winnerElo, $loserElo)
+
+    public function updateElo(Request $request)
+    {
+        $winnerId = $request->input("winner")["id"];
+        $loserId = $request->input("loser")["id"];
+        $winningPokemon = Pokemon::findOrFail($winnerId);
+        $losingPokemon = Pokemon::findOrFail($loserId);
+        $winnerEloPrev = $winningPokemon->elo;
+        $losingEloPrev = $losingPokemon->elo;
+
+        $winnerExpectedScore = $this->expectedScore($winnerEloPrev, $losingEloPrev);
+        $loserExpectedScore = $this->expectedScore($losingEloPrev, $winnerEloPrev);
+
+        $kFactor = 96;
+
+        $winnerEloFinal = $winnerEloPrev + $kFactor * (1 - $winnerExpectedScore);
+        $loserEloFinal = $losingEloPrev + $kFactor * (0 - $loserExpectedScore);
+
+        $winningPokemon->elo = (int) $winnerEloFinal;
+        $winningPokemon->save();
+        $losingPokemon->elo = (int) $loserEloFinal;
+        $losingPokemon->save();
+    }
+
+
+
+    private function expectedScore($winnerElo, $loserElo)
     {
         return 1 / (1 + pow(10, ($loserElo - $winnerElo) / 400));
     }
 
 
-
-
-    public function updateElo(Request $request)
-    {
-
-        $winnerId = $request->input("winner")["id"];
-        $loserId = $request->input("loser")["id"];
-        // UpdateElo::dispatch($winnerId, $loserId);
-        UpdateElo::dispatch($winnerId, $loserId);
-
-        // dd($winnerId, $loserId);
-    }
     public function skillBasedPairs()
     {
 
@@ -62,20 +76,7 @@ class PokemonController extends Controller
         return $competitorIndex;
     }
 
-    public function generateSets()
-    {
-        $pokemonList = Pokemon::inRandomOrder()->limit(100)->get();
-        $length = count($pokemonList);
-        $groupedList = [];
-        for ($i = 0; $i < $length; $i += 2) {
-            $group = [
-                $pokemonList[$i],
-                $pokemonList[$i + 1]
-            ];
-            $groupedList[] = $group;
-        }
-        return Inertia::render('Home', ["groupedList" => $groupedList]);
-    }
+
 
     public function index()
     {

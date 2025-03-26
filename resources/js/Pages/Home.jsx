@@ -78,7 +78,11 @@ export default function Home({ groupedList }) {
             Cookies.set("totalClicks", String(nextCount));
             return nextCount;
         });
+        if (index >= groupedList.length - 1) {
+            router.get(route("home"));
 
+            return;
+        }
         const winner = currentPair[cardIndex];
         const loser = currentPair[+!cardIndex];
         setEloUpdateQueue((prev) => [...prev, { winner, loser }]);
@@ -88,18 +92,13 @@ export default function Home({ groupedList }) {
 
             setLoadedImages([false, false]);
 
-            if (nextIndex >= groupedList.length - 1) {
-                router.get(route("home"));
-                return prevIndex;
-            } else {
-                setCurrentPair(groupedList[nextIndex]);
+            setCurrentPair(groupedList[nextIndex]);
 
-                setTimeout(() => {
-                    preloadImages(nextIndex + 1);
-                }, 100);
+            setTimeout(() => {
+                preloadImages(nextIndex + 1);
+            }, 100);
 
-                return nextIndex;
-            }
+            return nextIndex;
         });
     };
 
