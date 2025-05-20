@@ -6,11 +6,19 @@ import { useState } from "react";
 function Index({ paginatedData, allPokemon }) {
     const [searchTerm, setSearchTerm] = useState("");
 
-    const filteredPokemon = searchTerm
-        ? allPokemon.filter((pokemon) =>
-              pokemon.name.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-        : paginatedData.data;
+    const currentPage = paginatedData.current_page;
+    const itemsPerPage = paginatedData.per_page;
+    const dataArray = paginatedData.data || [];
+
+    const paginatedWithIndex = dataArray.map((item, index) => ({
+        ...item,
+        index: (currentPage - 1) * itemsPerPage + index + 1,
+    }));
+
+    const filteredPokemon = paginatedWithIndex.filter((pokemon) =>
+        pokemon.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div className="w-full min-h-screen px-4 py-6 mx-auto overflow-hidden bg-gray-900 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl">
@@ -53,10 +61,7 @@ function Index({ paginatedData, allPokemon }) {
                             </h3>
                             <div className="flex items-center justify-between w-full mt-1">
                                 <span className="text-xs text-gray-400 sm:text-sm">
-                                    #
-                                    {(paginatedData.current_page - 1) * 50 +
-                                        index +
-                                        1}
+                                    #{pokemon.index}
                                 </span>
                                 <span className="px-2 py-1 text-xs font-semibold text-yellow-300 bg-gray-700 rounded-md sm:text-sm">
                                     ELO: {pokemon.elo}
